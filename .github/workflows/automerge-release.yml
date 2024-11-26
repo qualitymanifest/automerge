@@ -1,0 +1,54 @@
+name: Auto Merge Release Branches
+
+on:
+  push:
+    branches:
+      - 'release/*'
+
+jobs:
+  update-release-branches:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git fetch
+
+    - name: Get the current branch name
+      run: echo "CURRENT_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+    - name: Get all release branches
+      run: |
+        RELEASE_BRANCHES=$(git branch -r | grep 'release/' | sed 's|origin/||' | sort -V | tr '\n' ' ')
+        echo "RELEASE_BRANCHES=${RELEASE_BRANCHES}" >> $GITHUB_ENV
+
+    - name: Determine next release branch
+      run: |
+        CURRENT_VERSION=${CURRENT_BRANCH#release/}
+        NEXT_BRANCH=""
+        for BRANCH in $RELEASE_BRANCHES; do
+          VERSION=${BRANCH#release/}
+          if [[ $VERSION > $CURRENT_VERSION ]]; then
+            NEXT_BRANCH=$BRANCH
+            break
+          fi
+        done
+        echo "next branch"
+        echo $NEXT_BRANCH
+        echo "NEXT_BRANCH=${NEXT_BRANCH}" >> $GITHUB_ENV
+
+    - name: Exit if no next branch exists
+      if: env.NEXT_BRANCH == ''
+      run: echo "No next release branch found. Exiting."
+
+    - name: Merge current branch into next branch
+      if: env.NEXT_BRANCH != ''
+      run: |
+        git checkout $NEXT_BRANCH
+        git merge --no-ff --no-edit release/$CURRENT_BRANCH
+        git push origin $NEXT_BRANCH
