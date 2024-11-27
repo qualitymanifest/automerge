@@ -17,7 +17,11 @@ jobs:
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git fetch
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 
 
     - name: Get the current branch name
       run: echo "CURRENT_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
@@ -49,7 +53,6 @@ jobs:
     - name: Merge current branch into next branch
       if: env.NEXT_BRANCH != ''
       run: |
-        git fetch origin $NEXT_BRANCH:$NEXT_BRANCH
         git checkout $NEXT_BRANCH
         git merge --no-ff --no-edit release/$CURRENT_BRANCH
         git push origin $NEXT_BRANCH
