@@ -5,19 +5,19 @@ on:
     branches:
       - 'release/*'
 
-permissions:
-  contents: write
-
 jobs:
   update-release-branches:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN }}
 
     steps:
     # Github doesn't automatically fetch full history which will cause "fatal: refusing to merge unrelated histories"
     - name: Fetch full repository history
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0 
+        fetch-depth: 0
+        token: ${{ secrets.AUTOMERGE_TOKEN }}
 
     - name: Set up Git
       run: |
