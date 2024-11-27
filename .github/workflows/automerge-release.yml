@@ -21,7 +21,7 @@ jobs:
     - name: Set up Git
       run: |
         git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git config user.email "qualitymanifest@gmail.com"
         echo "https://${{ secrets.AUTOMERGE_TOKEN }}@github.com" > ~/.git-credentials
         git config --global credential.helper store
 
