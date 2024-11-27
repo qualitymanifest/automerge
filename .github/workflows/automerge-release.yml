@@ -13,18 +13,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    # Github doesn't automatically fetch full history which will cause "fatal: refusing to merge unrelated histories"
+    - name: Fetch full repository history
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 
 
     - name: Set up Git
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0 
 
     - name: Get the current branch name
       run: echo "CURRENT_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
@@ -45,13 +43,7 @@ jobs:
             break
           fi
         done
-        echo "next branch"
-        echo $NEXT_BRANCH
         echo "NEXT_BRANCH=${NEXT_BRANCH}" >> $GITHUB_ENV
-
-    - name: Exit if no next branch exists
-      if: env.NEXT_BRANCH == ''
-      run: echo "No next release branch found. Exiting."
 
     - name: Merge current branch into next branch
       if: env.NEXT_BRANCH != ''
