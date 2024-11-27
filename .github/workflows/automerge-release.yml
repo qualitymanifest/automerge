@@ -34,11 +34,11 @@ jobs:
 
     - name: Determine next release branch
       run: |
-        CURRENT_VERSION=${CURRENT_BRANCH#release/}
+        CURRENT_VERSION=$(echo "$CURRENT_BRANCH" | grep -oP '\d+(\.\d+)*')
         NEXT_BRANCH=""
         for BRANCH in $RELEASE_BRANCHES; do
-          VERSION=${BRANCH#release/}
-          if [[ $VERSION > $CURRENT_VERSION ]]; then
+          VERSION=$(echo "$BRANCH" | grep -oP '\d+(\.\d+)*')
+          if dpkg --compare-versions "$VERSION" gt "$CURRENT_VERSION"; then
             NEXT_BRANCH=$BRANCH
             break
           fi
