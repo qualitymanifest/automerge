@@ -18,6 +18,13 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Set up Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        echo "https://${{ secrets.AUTOMERGE_TOKEN }}@github.com" > ~/.git-credentials
+        git config --global credential.helper store
+
     - name: Get the current branch name
       run: echo "CURRENT_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
