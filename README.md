@@ -8,3 +8,7 @@
         - "Contents": "Read and write"
         - "Secrets": "Read-only"
         - "Variables": "Read-only"
+
+### VARIABLES
+- `SKIP_AUTOMERGE_GTE_VERSION`: If present, don't try to auto-merge into a release branch where the version is greater than this version
+    - Example: 2.0.0
