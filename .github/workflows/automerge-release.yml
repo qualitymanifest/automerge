@@ -41,7 +41,7 @@ jobs:
         NEXT_BRANCH=""
         for BRANCH in $RELEASE_BRANCHES; do
           VERSION=$(echo "$BRANCH" | grep -oP '\d+(\.\d+)*')
-          if [[ -n "$SKIP_AUTOMERGE_GTE_VERSION" ]] && dpkg --compare-versions "$VERSION" gte "$SKIP_AUTOMERGE_GTE_VERSION"; then
+          if [[ -n "$SKIP_AUTOMERGE_GTE_VERSION" ]] && dpkg --compare-versions "$VERSION" ge "$SKIP_AUTOMERGE_GTE_VERSION"; then
             echo "Greater than or equal to skip version"
             echo $SKIP_AUTOMERGE_GTE_VERSION
             echo $VERSION
