@@ -12,7 +12,6 @@ jobs:
       GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN }}
 
     steps:
-    # Github doesn't automatically fetch full history which will cause "fatal: refusing to merge unrelated histories"
     - name: Fetch full repository history
       uses: actions/checkout@v3
       with:
@@ -30,8 +29,6 @@ jobs:
     - name: Get all release branches
       run: |
         RELEASE_BRANCHES=$(git branch -r | grep 'release/' | sed 's|origin/||' | sort -V | tr '\n' ' ')
-        echo "sorted release branches:"
-        echo $RELEASE_BRANCHES
         echo "RELEASE_BRANCHES=${RELEASE_BRANCHES}" >> $GITHUB_ENV
 
     - name: Determine next release branch
@@ -42,9 +39,7 @@ jobs:
         for BRANCH in $RELEASE_BRANCHES; do
           VERSION=$(echo "$BRANCH" | grep -oP '\d+(\.\d+)*')
           if [[ -n "$SKIP_AUTOMERGE_GTE_VERSION" ]] && dpkg --compare-versions "$VERSION" ge "$SKIP_AUTOMERGE_GTE_VERSION"; then
-            echo "Greater than or equal to skip version"
-            echo $SKIP_AUTOMERGE_GTE_VERSION
-            echo $VERSION
+            echo "Version $VERSION meets or exceeds SKIP_AUTOMERGE_GTE_VERSION of $SKIP_AUTOMERGE_GTE_VERSION"
             break
           fi
           if dpkg --compare-versions "$VERSION" gt "$CURRENT_VERSION"; then
