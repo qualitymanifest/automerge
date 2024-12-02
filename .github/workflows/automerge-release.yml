@@ -30,14 +30,23 @@ jobs:
     - name: Get all release branches
       run: |
         RELEASE_BRANCHES=$(git branch -r | grep 'release/' | sed 's|origin/||' | sort -V | tr '\n' ' ')
+        echo "sorted release branches:"
+        echo $RELEASE_BRANCHES
         echo "RELEASE_BRANCHES=${RELEASE_BRANCHES}" >> $GITHUB_ENV
 
     - name: Determine next release branch
       run: |
         CURRENT_VERSION=$(echo "$CURRENT_BRANCH" | grep -oP '\d+(\.\d+)*')
+        SKIP_AUTOMERGE_GTE_VERSION="${{ vars.SKIP_AUTOMERGE_GTE_VERSION }}"
         NEXT_BRANCH=""
         for BRANCH in $RELEASE_BRANCHES; do
           VERSION=$(echo "$BRANCH" | grep -oP '\d+(\.\d+)*')
+          if ($SKIP_AUTOMERGE_GTE_VERSION != '' && dpkg --compare-versions "$VERSION" gte "$SKIP_AUTOMERGE_GTE_VERSION")
+            echo "Greater than or equal to skip version"
+            echo $SKIP_AUTOMERGE_GTE_VERSION
+            echo $VERSION
+            break
+          fi
           if dpkg --compare-versions "$VERSION" gt "$CURRENT_VERSION"; then
             NEXT_BRANCH=$BRANCH
             break
